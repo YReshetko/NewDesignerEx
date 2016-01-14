@@ -6,20 +6,23 @@
  * To change this template use File | Settings | File Templates.
  */
 function init(){
-	var p1 = new td.panel({x : 10, y : 10, width : 200, height : 500, title : "panel 1"});
-	var p2 = new td.panel({x : 220, y : 10, width : 200, height : 500, title : "panel 2"});
-	//var p3 = new td.panel({x : 430, y : 10, width : 200, height : 500, title : "panel 3"});
+	var p1 = new td.panel({x : 10, y : 10, width : 300, height : 600, title : "PANEL 1"});
+	var p2 = new td.panel({x : 10, y : 10, width : 200, height : 500, title : "panel 2"});
+	var p3 = new td.panel({x : 10, y : 10, width : 100, height : 400, title : "panel 3"});
 
 	$(".stage").append(p1.panel);
-	$(".stage").append(p2.panel);
+	p1.container.append(p2.panel);
+	p2.container.append(p3.panel);
 	//$(".stage").append(p3.panel);
 
 	p1.draggable = true;
 	p2.draggable = true;
+	p3.draggable = true;
 	//p3.draggable = true;
 
 	p1.resizeble = true;
 	p2.resizeble = true;
+	p3.resizeble = true;
 
 	//p2.container.append("SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>");
 }
@@ -48,9 +51,9 @@ td.panel = function(config){
 	this._draggable = false;
 	this._resizeble = false;
 	this._headerHeight = 20;
-	this._borderSize = 2;
-	this._minWidth = 50;
-	this._minHeight = 35;
+	this._borderSize = 1;
+	this._minWidth = 70;
+	this._minHeight = 55;
 
 	this._init = function(){
 		var mainStyle = {
@@ -58,14 +61,14 @@ td.panel = function(config){
 			height      :config.height + "px",
 			left        :config.x + "px",
 			top         :config.y + "px",
-			background  :"#999",
+			//background  :"#999",
 			position    : "absolute",
 			cursor      : "auto"
 		};
 		var headerStyle = {
 			width:(config.width - this._borderSize*2) + "px",
 			height:this._headerHeight + "px",
-			background:"#eee",
+			//background:"#eee",
 			position: "relative",
 			left:this._borderSize + "px",
 			top:this._borderSize + "px",
@@ -75,7 +78,7 @@ td.panel = function(config){
 		var bodyStyle = {
 			width:(config.width - this._borderSize*2) + "px",
 			height:(config.height - this._headerHeight - (this._borderSize * 3)) + "px",
-			background:"#111",
+			//background:"#111",
 			position: "relative",
 			left:this._borderSize + "px",
 			top: this._borderSize*2 + "px",
@@ -84,14 +87,15 @@ td.panel = function(config){
 		var containerStyle = {
 			width:"100%",
 			height:"100%",
-			background:"#fff",
+			//background:"#fff",
 			position: "relative",
 			overflow: "auto"
 		};
-		this._panel = $("<div/>").css(mainStyle);
-		this._header = $("<div>"+this._title+"</div>").css(headerStyle);
-		this._body = $("<div/>").css(bodyStyle);
-		this._container = $("<div/>").css(containerStyle);
+		this._panel = $("<div/>").css(mainStyle).addClass("simple-panel");
+		this._header = $("<div/>").css(headerStyle).addClass("panel-header");
+		$(this._header).append("<div>"+this._title+"</div>");
+		this._body = $("<div/>").css(bodyStyle).addClass("panel-body");
+		this._container = $("<div/>").css(containerStyle).addClass("panel-container");
 		this._panel.append(this._header);
 		this._panel.append(this._body);
 		this._body.append(this._container);
@@ -199,7 +203,6 @@ td.EvenDispatcher = function(){
 }
 td.panel.prototype = new td.EvenDispatcher();
 
-
 td.move = function(div, panel, draggable){
     function moveFunc(e){
         $(panel).css("z-index", 10);
@@ -243,10 +246,10 @@ td.resize = function(container, object, resizeble){
     function freeMouseMove(e){
         var x = e.offsetX;
         var y = e.offsetY;
-        var xLeft = x<=object.borderSize;
-        var xRight = x>=(object.width - object.borderSize);
-        var yUp = y<=object.borderSize;
-        var yDown = y>=(object.height-object.borderSize);
+        var xLeft = x<=object.borderSize*3;
+        var xRight = x>=(object.width - object.borderSize*3);
+        var yUp = y<=object.borderSize*3;
+        var yDown = y>=(object.height - object.borderSize*3);
 
         var right = xRight && !yUp && !yDown;
         var left = xLeft && !yUp && !yDown;

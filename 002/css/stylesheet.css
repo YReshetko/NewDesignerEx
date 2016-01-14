@@ -1,0 +1,33 @@
+html, body{
+    margin: 0 auto;
+    height: 100%;
+}
+body{
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.simple-panel{
+    background: #333;
+}
+.panel-header{
+    background: #666;
+    color: #343434;
+    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#eaf0f4+0,b4b4b4+8,e8e8e8+59,f3f3f3+99 */
+    background: #eaf0f4; /* Old browsers */
+    background: -moz-linear-gradient(left,  #eaf0f4 0%, #b4b4b4 8%, #e8e8e8 59%, #f3f3f3 99%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(left,  #eaf0f4 0%,#b4b4b4 8%,#e8e8e8 59%,#f3f3f3 99%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to right,  #eaf0f4 0%,#b4b4b4 8%,#e8e8e8 59%,#f3f3f3 99%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaf0f4', endColorstr='#f3f3f3',GradientType=1 ); /* IE6-9 */
+}
+.panel-header > div{
+    text-indent: 15px;
+    line-height: 1.2;
+    text-shadow: 1px 1px #D8D8D8;
+}
+.panel-body{
+    background: #fff;
+}
