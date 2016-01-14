@@ -10,7 +10,7 @@ function init(){
 	target = document.getElementById("your-files");
 	mainWrapper = document.getElementById("main-wrapper");
 	target.addEventListener("dragover", function(event) {
-		event.preventDefault(); // отменяем действие по умолчанию
+		event.preventDefault(); // ???????? ???????? ?? ?????????
 		$(target).addClass("your-files1");
 	}, false);
 	target.ondragleave = function(event){
@@ -18,13 +18,13 @@ function init(){
 		$(target).removeClass("your-files1");
 	}
 	mainWrapper.addEventListener("dragover", function(event) {
-		event.preventDefault(); // отменяем действие по умолчанию
+		event.preventDefault(); // ???????? ???????? ?? ?????????
 	}, false);
 	mainWrapper.addEventListener("drop", function(event) {
-		event.preventDefault(); // отменяем действие по умолчанию
+		event.preventDefault(); // ???????? ???????? ?? ?????????
 	}, false);
 	target.addEventListener("drop", function(event) {
-		// отменяем действие по умолчанию
+		// ???????? ???????? ?? ?????????
 		event.preventDefault();
 		$(target).removeClass("your-files1");
 		var i = 0,
