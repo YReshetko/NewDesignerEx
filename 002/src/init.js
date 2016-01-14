@@ -6,9 +6,9 @@
  * To change this template use File | Settings | File Templates.
  */
 function init(){
-	var p1 = new td.panel({x : 10, y : 10, width : 300, height : 600, title : "PANEL 1"});
-	var p2 = new td.panel({x : 10, y : 10, width : 200, height : 500, title : "panel 2"});
-	var p3 = new td.panel({x : 10, y : 10, width : 100, height : 400, title : "panel 3"});
+	var p1 = new td.Panel({x : 10, y : 10, width : 300, height : 600, title : "PANEL 1"});
+	var p2 = new td.Panel({x : 10, y : 10, width : 200, height : 500, title : "яжемю"});
+	var p3 = new td.Panel({x : 10, y : 10, width : 100, height : 400, title : "panel 3"});
 
 	$(".stage").append(p1.panel);
 	p1.container.append(p2.panel);
@@ -23,6 +23,8 @@ function init(){
 	p1.resizeble = true;
 	p2.resizeble = true;
 	p3.resizeble = true;
+
+	p1.title = "CHANGE NAME";
 
 	//p2.container.append("SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>");
 }
@@ -39,36 +41,26 @@ if(typeof(td) == 'undefined') td = function(){};
 *     title  - panel title
 * }
 */
-td.panel = function(config){
-	//this.prototype = Object.create(td.base);
-   // this.prototype.constructor = td.panel;
-
-	this._title = config.title;
+td.BasePanel = function(){
+	//this._title = config.title;
 	this._panel;
 	this._header;
 	this._body;
 	this._container;
 	this._draggable = false;
 	this._resizeble = false;
-	this._headerHeight = 20;
+	this._headerHeight = 15;
 	this._borderSize = 1;
 	this._minWidth = 70;
 	this._minHeight = 55;
 
-	this._init = function(){
+	this._init = function(config){
 		var mainStyle = {
-			width       :config.width + "px",
-			height      :config.height + "px",
-			left        :config.x + "px",
-			top         :config.y + "px",
-			//background  :"#999",
 			position    : "absolute",
 			cursor      : "auto"
 		};
 		var headerStyle = {
-			width:(config.width - this._borderSize*2) + "px",
 			height:this._headerHeight + "px",
-			//background:"#eee",
 			position: "relative",
 			left:this._borderSize + "px",
 			top:this._borderSize + "px",
@@ -76,9 +68,6 @@ td.panel = function(config){
 			overflow: "hidden"
 		};
 		var bodyStyle = {
-			width:(config.width - this._borderSize*2) + "px",
-			height:(config.height - this._headerHeight - (this._borderSize * 3)) + "px",
-			//background:"#111",
 			position: "relative",
 			left:this._borderSize + "px",
 			top: this._borderSize*2 + "px",
@@ -87,18 +76,22 @@ td.panel = function(config){
 		var containerStyle = {
 			width:"100%",
 			height:"100%",
-			//background:"#fff",
 			position: "relative",
 			overflow: "auto"
 		};
-		this._panel = $("<div/>").css(mainStyle).addClass("simple-panel");
+		this._panel = $("<div/>").css(mainStyle).addClass("panel-main");
 		this._header = $("<div/>").css(headerStyle).addClass("panel-header");
-		$(this._header).append("<div>"+this._title+"</div>");
+		//$(this._header).append("<div>"+this._title+"</div>");
 		this._body = $("<div/>").css(bodyStyle).addClass("panel-body");
 		this._container = $("<div/>").css(containerStyle).addClass("panel-container");
 		this._panel.append(this._header);
 		this._panel.append(this._body);
 		this._body.append(this._container);
+		this.width = config.width;
+		this.height = config.height;
+		this.x = config.x;
+		this.y = config.y;
+
 	};
 	Object.defineProperties(this,{
 		header : {
@@ -187,7 +180,6 @@ td.panel = function(config){
 		    }
 		}
 	});
-	this._init();
 }
 td.EvenDispatcher = function(){
     this._event = "";
@@ -201,7 +193,27 @@ td.EvenDispatcher = function(){
 
     }
 }
-td.panel.prototype = new td.EvenDispatcher();
+td.BasePanel.prototype = new td.EvenDispatcher();
+
+td.Panel = function(config){
+	this._title = config.title;
+	this._init(config);
+	this._titleObject = $("<div>"+this._title+"</div>").addClass("panel-title");
+	this.header.append(this._titleObject);
+	Object.defineProperties(this,{
+		title : {
+			get : function(){
+				return this._title;
+			},
+			set : function(value){
+				this._titleObject.empty();
+				this._titleObject.append(value);
+				this._title = value;
+			}
+		}
+	});
+}
+td.Panel.prototype = new td.BasePanel();
 
 td.move = function(div, panel, draggable){
     function moveFunc(e){
@@ -233,7 +245,18 @@ td.move = function(div, panel, draggable){
 }
 
 td.resize = function(container, object, resizeble){
-    var resizeType = "none";
+	var resizeTypes = {
+		right       : {type : "right",      flag : false, cursor : "e-resize",      func : resizeRight      },
+		left        : {type : "left",       flag : false, cursor : "e-resize",      func : resizeLeft       },
+		up          : {type : "up",         flag : false, cursor : "n-resize",      func : resizeUp         },
+		down        : {type : "down",       flag : false, cursor : "n-resize",      func : resizeDown       },
+		rightUp     : {type : "rightUp",    flag : false, cursor : "nesw-resize",   func : resizeRightUp    },
+		rightDown   : {type : "rightDown",  flag : false, cursor : "nwse-resize",   func : resizeRightDown  },
+		leftUp      : {type : "leftUp",     flag : false, cursor : "nwse-resize",   func : resizeLeftUp     },
+		leftDown    : {type : "leftDown",   flag : false, cursor : "nesw-resize",   func : resizeLeftDown   },
+		none        : {type : "none",       flag : true,  cursor : "auto",          func : null             }
+	};
+	var resizeType = resizeTypes.none;
     function overPanel(e){
         $(container).on("mousemove", freeMouseMove);
         $(container).on("mousedown", resizeMouseDown);
@@ -246,60 +269,35 @@ td.resize = function(container, object, resizeble){
     function freeMouseMove(e){
         var x = e.offsetX;
         var y = e.offsetY;
-        var xLeft = x<=object.borderSize*3;
-        var xRight = x>=(object.width - object.borderSize*3);
-        var yUp = y<=object.borderSize*3;
-        var yDown = y>=(object.height - object.borderSize*3);
+        var xLeft = x<=object.borderSize;
+        var xRight = x>=(object.width - object.borderSize);
+        var yUp = y<=object.borderSize;
+        var yDown = y>=(object.height - object.borderSize);
 
-        var right = xRight && !yUp && !yDown;
-        var left = xLeft && !yUp && !yDown;
-        var up = yUp && !xRight && !xLeft;
-        var down = yDown && !xRight && !xLeft;
+	    resizeTypes.right.flag = xRight && !yUp && !yDown;
+	    resizeTypes.left.flag = xLeft && !yUp && !yDown;
+	    resizeTypes.up.flag = yUp && !xRight && !xLeft;
+	    resizeTypes.down.flag = yDown && !xRight && !xLeft;
 
-        var rightUp = xRight && yUp;
-        var rightDown = xRight && yDown;
-        var leftUp = xLeft && yUp;
-        var leftDown = xLeft && yDown;
+	    resizeTypes.rightUp.flag = xRight && yUp;
+	    resizeTypes.rightDown.flag = xRight && yDown;
+	    resizeTypes.leftUp.flag = xLeft && yUp;
+	    resizeTypes.leftDown.flag = xLeft && yDown;
+	    resizeTypes.none.flag = true;
+	    resizeType = resizeTypes.none;
 
-        if(right){
-            $(container).css("cursor", "e-resize");
-            resizeType = "right";
-        } else if(left){
-            $(container).css("cursor", "e-resize");
-            resizeType = "left";
-        } else if(up){
-            $(container).css("cursor", "n-resize");
-            resizeType = "up";
-        } else if(down){
-            $(container).css("cursor", "n-resize");
-            resizeType = "down";
-        } else if(rightUp){
-            $(container).css("cursor", "nesw-resize");
-            resizeType = "rightUp";
-        } else if(leftDown){
-            $(container).css("cursor", "nesw-resize");
-            resizeType = "leftDown";
-        } else if(rightDown){
-            $(container).css("cursor", "nwse-resize");
-            resizeType = "rightDown";
-        } else if(leftUp){
-            $(container).css("cursor", "nwse-resize");
-            resizeType = "leftUp";
-        } else{
-            $(container).css("cursor", "auto");
-            resizeType = "none";
-        }
+	    for(obj in resizeTypes){
+		    if(resizeTypes[obj].flag){
+			    resizeType = resizeTypes[obj];
+			    $(container).css("cursor", resizeType.cursor);
+			    return;
+		    }
+	    }
     }
     function resizeMouseDown(e){
-        if(resizeType == "none") return;
-        if(resizeType == "right") $(document).on("mousemove", resizeRight);
-        if(resizeType == "left") $(document).on("mousemove", resizeLeft);
-        if(resizeType == "down") $(document).on("mousemove", resizeDown);
-        if(resizeType == "up") $(document).on("mousemove", resizeUp);
-        if(resizeType == "rightUp") $(document).on("mousemove", resizeRightUp);
-        if(resizeType == "rightDown") $(document).on("mousemove", resizeRightDown);
-        if(resizeType == "leftUp") $(document).on("mousemove", resizeLeftUp);
-        if(resizeType == "leftDown") $(document).on("mousemove", resizeLeftDown);
+	    if(resizeType.type == "none") return;
+	    $(container).off("mousemove", freeMouseMove);
+	    $(document).on("mousemove", resizeType.func);
         $(document).on("mouseup", removeResize);
     }
     function resizeRight(e){
@@ -337,15 +335,9 @@ td.resize = function(container, object, resizeble){
         resizeDown(e);
     }
     function removeResize(e){
-        $(document).off("mousemove", resizeRight);
-        $(document).off("mousemove", resizeLeft);
-        $(document).off("mousemove", resizeDown);
-        $(document).off("mousemove", resizeUp);
-        $(document).off("mousemove", resizeRightUp);
-        $(document).off("mousemove", resizeRightDown);
-        $(document).off("mousemove", resizeLeftUp);
-        $(document).off("mousemove", resizeLeftDown);
-        $(document).off("mouseup", removeResize);
+	    $(document).off("mousemove", resizeType.func);
+	    $(document).off("mouseup", removeResize);
+	    $(container).on("mousemove", freeMouseMove);
     }
     if(resizeble){
         $(container).on("mouseover", overPanel);
