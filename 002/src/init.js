@@ -8,24 +8,51 @@
 function init(){
 	var p1 = new td.Panel({x : 10, y : 10, width : 300, height : 600, title : "PANEL 1"});
 	var p2 = new td.Panel({x : 10, y : 10, width : 200, height : 500, title : "яжемю"});
-	var p3 = new td.Panel({x : 10, y : 10, width : 100, height : 400, title : "panel 3"});
+
+	var p3 = new td.Panel({x : 10, y : 10, width : 100, height : 400, title : "Block 2 p1"});
+	var p4 = new td.Panel({x : 10, y : 10, width : 100, height : 400, title : "Block 2 p2"});
 
 	$(".stage").append(p1.panel);
-	p1.container.append(p2.panel);
-	p2.container.append(p3.panel);
+	/*$(".stage").append(p2.panel);
+	$(".stage").append(p3.panel);  */
 	//$(".stage").append(p3.panel);
 
-	p1.draggable = true;
+	/*p1.draggable = true;
 	p2.draggable = true;
 	p3.draggable = true;
 	//p3.draggable = true;
 
 	p1.resizeble = true;
 	p2.resizeble = true;
-	p3.resizeble = true;
+	p3.resizeble = true; */
 
 	p1.title = "CHANGE NAME";
 
+	p1.container.append("CONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\nCONTENT P1 \r\n");
+	p2.container.append("CONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\nCONTENT P2 \r\n");
+
+
+	p3.container.append("CONTENT Block 2 p1 \r\nCONTENT Block 2 p1 \r\nCONTENT Block 2 p1 \r\nCONTENT Block 2 p1 \r\nCONTENT Block 2 p1 \r\nCONTENT Block 2 p1 \r\nCONTENT Block 2 p1 \r\n");
+	p4.container.append("CONTENT Block 2 p2 \r\nCONTENT Block 2 p2 \r\nCONTENT Block 2 p2 \r\nCONTENT Block 2 p2 \r\nCONTENT Block 2 p2 \r\nCONTENT Block 2 p2 \r\nCONTENT Block 2 p2 \r\n");
+
+
+	var b1 = new td.Block({x : 10, y : 10, width : 250, height : 400});
+	var b2 = new td.Block({x : 350, y : 10, width : 250, height : 400});
+	$(".stage").append(b1.panel);
+	$(".stage").append(b2.panel);
+
+	b1.addPanel(p1);
+	b1.addPanel(p2);
+	b1.resizeble = true;
+	b1.draggable = true;
+
+
+	b2.addPanel(p3);
+	b2.addPanel(p4);
+	b2.addPanel(p1);
+	b2.addPanel(p2);
+	b2.resizeble = true;
+	b2.draggable = true;
 	//p2.container.append("SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>SomeString<br>");
 }
 
@@ -214,6 +241,62 @@ td.Panel = function(config){
 	});
 }
 td.Panel.prototype = new td.BasePanel();
+
+td.Block = function(config){
+	this._headerHeight = 20;
+	this._panels = new Array();
+//	this._isDraggable = false;
+	var hearedHeight = this._headerHeight;
+
+	_tab = function(title){
+		this._tabHeight = 12;
+		var tabStyle = {
+			height:this._tabHeight + "px",
+			top : (hearedHeight - this._tabHeight - 6) + "px",
+			position: "relative",
+			display: "inline",
+			"white-space": "nowrap"
+		};
+		this._tab = $("<div>"+title+"\t"+"</div>").css(tabStyle).addClass("block-panel-tab");
+	}
+	this.addPanel = function(panel){
+		panel.panel.remove();
+		var tab = new _tab(panel.title);
+		var id = this._panels.length;
+		this._panels.push({
+			panel : panel,
+			tab : tab,
+			content : panel.container.html()
+		});
+		this.header.append(tab._tab);
+		var self = this;
+		tab._tab.on("mousedown", function(e){
+			self.select(id);
+//			self._isDraggable = self.draggable;
+			self.draggable = false;
+		});
+//		tab._tab.on("mouseup mouseover", function(e){
+//			self.draggable = self._isDraggable;
+//		});
+
+
+		this.select(id);
+	}
+	this.select = function(id){
+		var i,l;
+		l = this._panels.length;
+		for(i=0;i<l;i++){
+			this._panels[i].tab._tab.removeClass("tab-select");
+			this._panels[i].tab._tab.css("z-index", 1);
+		}
+		this.container.empty();
+		this.container.append(this._panels[id].content);
+		this._panels[id].tab._tab.addClass("tab-select");
+		this._panels[id].tab._tab.css("z-index", 2);
+	}
+	this._init(config);
+}
+td.Block.prototype = new td.BasePanel();
 
 td.move = function(div, panel, draggable){
     function moveFunc(e){
